@@ -16,3 +16,6 @@ next-env.d.ts
 
 # OS
 .DS_Store
+
+# brainstorming visual companion
+.superpowers/
