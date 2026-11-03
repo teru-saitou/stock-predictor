@@ -145,5 +145,13 @@ lint-imports    # 依存ルールのチェック（違反があると BROKEN と
 - **特徴量の重要度**: どの指標が効いているかを可視化
 - **複数銘柄での一括比較**: 設定ごとの成績を多数の銘柄で集計し、偶然でない改善かを確かめる
 
+## 毎朝の予測（自動更新）
+GitHub Actions（`.github/workflows/nightly.yml`）が火〜土の 7:00（日本時間）に、決めた銘柄の予測・バックテストを計算し直し、結果を `frontend/public/nightly.json` にコミットします。画面の「毎朝の予測」（`/nightly`）でまとめて見られます。API サーバーを使わないので、Render が止まっていてもすぐ表示されます。
+
+- 対象の銘柄は `backend/nightly_tickers.txt` で増減する（1行に1つ）
+- 今すぐ動かしたいときは、GitHub の Actions タブ →「nightly」→「Run workflow」
+- 手元で試すとき（backend フォルダで）: `python -m app.nightly --tickers nightly_tickers.txt --out ../frontend/public/nightly.json`
+- 一部の銘柄の取得に失敗しても、残りは更新されます。全部失敗したときは前回の結果を残し、Actions が失敗扱いになります（GitHub からメールが届きます）
+
 ## 注意
 このアプリは学習・実験用です。予測やバックテストの結果は将来の成績を保証しません。

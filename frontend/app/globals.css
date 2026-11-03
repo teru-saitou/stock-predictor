@@ -130,3 +130,16 @@ code {
 details.more { font-size: 13px; border-top: 1px solid var(--border); padding-top: 10px; }
 details.more h3 { font-size: 13px; margin: 12px 0 4px; }
 details.more ul { margin: 4px 0; color: var(--muted); }
+
+/* 毎朝の予測（/nightly） */
+.page-link { font-size: 13px; margin: -16px 0 24px; }
+.page-link a, .sub a { color: var(--accent); }
+.table-wrap { overflow-x: auto; }
+table.nightly { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+table.nightly th { text-align: left; color: var(--muted); font-weight: 500; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+table.nightly td { padding: 10px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+table.nightly tbody tr:not(:has(.error)) { cursor: pointer; }
+table.nightly tbody tr:not(:has(.error)):hover, table.nightly tr.active { background: var(--bg); }
+table.nightly .row-name { font-weight: 600; margin-right: 6px; }
+table.nightly td.error { white-space: normal; }
+.muted { color: var(--muted); margin-left: 2px; }

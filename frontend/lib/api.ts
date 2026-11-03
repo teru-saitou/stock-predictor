@@ -1,4 +1,5 @@
 // バックエンド API の呼び出しはすべてここに集める
+import type { NightlyReport } from "@/types/nightly";
 import type { PredictOptions, PredictResponse } from "@/types/predict";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -28,4 +29,12 @@ export async function fetchPrediction(ticker: string, opts: PredictOptions): Pro
     throw new ApiError(detail, res.status);
   }
   return body as PredictResponse;
+}
+
+// 毎朝 GitHub Actions が計算して置いておく結果（API サーバーは使わない）
+export async function fetchNightlyReport(): Promise<NightlyReport | null> {
+  const res = await fetch("/nightly.json", { cache: "no-store" }).catch(() => null);
+  if (!res || res.status === 404) return null;
+  if (!res.ok) throw new ApiError("毎朝の予測を読み込めませんでした", res.status);
+  return (await res.json()) as NightlyReport;
 }
