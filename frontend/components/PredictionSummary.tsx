@@ -1,6 +1,6 @@
 import type { PredictResponse } from "@/types/predict";
 import { pct } from "@/lib/format";
-import { hints, isCoinFlip } from "@/lib/reading";
+import { baselineTone, hints, isCoinFlip } from "@/lib/reading";
 import { ConditionBar } from "./ConditionBar";
 import { Stat } from "./Stat";
 import { VerdictBanner } from "./VerdictBanner";
@@ -30,7 +30,7 @@ export function PredictionSummary({ data }: { data: PredictResponse }) {
         <Stat
           label="ベースライン正解率"
           value={pct(m.baseline_accuracy)}
-          tone={beatsBaseline ? "up" : "down"}
+          tone={baselineTone(m)}
           hint={h.baseline}
         />
       </div>

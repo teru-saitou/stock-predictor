@@ -46,7 +46,7 @@ export function BacktestResult({ metrics: m, equity, prices, prob }: Props) {
   const data = withPrices(equity, prices);
   return (
     <div className="card">
-      <h2>バックテスト（{m.test_period[0]} 〜 {m.test_period[1]}）</h2>
+      <h2>バックテスト＝過去データでの試し運用（{m.test_period[0]} 〜 {m.test_period[1]}）</h2>
       <p className="lead">もし過去にこのモデルの予測どおり売買していたら、お金がどう増減したかを試算したものです。</p>
       <div className="grid">
         <Stat
@@ -92,6 +92,7 @@ export function BacktestResult({ metrics: m, equity, prices, prob }: Props) {
         {m.validation === "walk_forward"
           ? `最初の学習期間: ${m.train_period[0]} 〜 ${m.train_period[1]}。以降は${m.retrain_every}営業日ごとに、その時点までの全データで学習し直しています。`
           : `学習期間: ${m.train_period[0]} 〜 ${m.train_period[1]}。`}
+        実際には利益に約20%（20.315%）の税金がかかりますが、この試算には含めていません。
         これは学習用のシミュレーションで、将来の成績を保証するものではありません。
       </p>
     </div>
