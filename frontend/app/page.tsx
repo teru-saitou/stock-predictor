@@ -39,7 +39,12 @@ export default function Home() {
         <>
           <PredictionSummary data={data} />
           <PriceChart prices={data.prices} />
-          <BacktestResult metrics={data.metrics} equity={data.equity} />
+          <BacktestResult
+            metrics={data.metrics}
+            equity={data.equity}
+            prices={data.prices}
+            prob={data.next_up_probability}
+          />
         </>
       )}
     </main>
