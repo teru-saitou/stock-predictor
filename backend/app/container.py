@@ -1,12 +1,12 @@
 """組み立て（Composition Root）。
 
 「どのポートにどの実装を差し込むか」を決めるのはこのファイルだけ。
-データ源やモデルを差し替えるときは、ここを変える。
+データ源・特徴量・モデルを差し替えるときは、ここを変える。
 """
 from app.application.ports.price_repository import PriceRepository
 from app.application.use_cases.predict_stock import PredictStockConfig, PredictStockUseCase
 from app.config import Settings
-from app.infrastructure.ml.features import TechnicalFeatureBuilder
+from app.infrastructure.ml.features import ExtendedFeatureBuilder, TechnicalFeatureBuilder
 from app.infrastructure.ml.sklearn_predictor import SklearnUpDownPredictor
 from app.infrastructure.repositories.demo_repository import DemoPriceRepository
 from app.infrastructure.repositories.routing_repository import RoutingPriceRepository
@@ -25,11 +25,15 @@ def build_predict_stock_use_case(
 ) -> PredictStockUseCase:
     return PredictStockUseCase(
         repo=repo or build_price_repository(),
-        features=TechnicalFeatureBuilder(),
+        feature_builders={
+            "basic": TechnicalFeatureBuilder(),
+            "extended": ExtendedFeatureBuilder(),
+        },
         predictor_factory=SklearnUpDownPredictor,
         config=PredictStockConfig(
             test_ratio=settings.test_ratio,
             min_rows=settings.min_rows,
             chart_days=settings.chart_days,
+            retrain_every=settings.retrain_every,
         ),
     )

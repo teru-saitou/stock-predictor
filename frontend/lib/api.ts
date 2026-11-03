@@ -1,5 +1,5 @@
 // バックエンド API の呼び出しはすべてここに集める
-import type { Period, PredictResponse } from "@/types/predict";
+import type { PredictOptions, PredictResponse } from "@/types/predict";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -9,8 +9,13 @@ export class ApiError extends Error {
   }
 }
 
-export async function fetchPrediction(ticker: string, period: Period): Promise<PredictResponse> {
-  const q = new URLSearchParams({ ticker, period });
+export async function fetchPrediction(ticker: string, opts: PredictOptions): Promise<PredictResponse> {
+  const q = new URLSearchParams({
+    ticker,
+    period: opts.period,
+    feature_set: opts.featureSet,
+    validation: opts.validation,
+  });
   let res: Response;
   try {
     res = await fetch(`${API_URL}/api/predict?${q}`);

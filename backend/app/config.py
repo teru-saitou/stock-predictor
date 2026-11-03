@@ -8,6 +8,7 @@ class Settings:
     test_ratio: float = 0.3
     min_rows: int = 200
     chart_days: int = 500
+    retrain_every: int = 20  # ウォークフォワードの再学習間隔（営業日）
 
 
 settings = Settings()

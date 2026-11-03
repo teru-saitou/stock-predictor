@@ -1,5 +1,6 @@
 import type { PredictResponse } from "@/types/predict";
 import { pct } from "@/lib/format";
+import { ConditionBar } from "./ConditionBar";
 import { Stat } from "./Stat";
 
 export function PredictionSummary({ data }: { data: PredictResponse }) {
@@ -16,6 +17,7 @@ export function PredictionSummary({ data }: { data: PredictResponse }) {
       <h2>
         予測（{data.latest_date} 終値 {data.latest_close.toLocaleString()} 時点）
       </h2>
+      <ConditionBar metrics={m} />
       <div className="grid">
         <Stat label="翌営業日に上がる確率" value={pct(prob)} tone={prob >= 0.5 ? "up" : "down"} />
         <Stat label="テスト期間の正解率" value={pct(m.accuracy)} />

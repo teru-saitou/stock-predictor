@@ -25,6 +25,25 @@ def test_predict_demo():
     assert body["name"] == "デモ銘柄（疑似データ）"
     assert 0 <= body["next_up_probability"] <= 1
     assert body["metrics"]["test_days"] == len(body["equity"])
+    # 既定は「拡張特徴量 + ウォークフォワード」
+    assert body["metrics"]["feature_set"] == "extended"
+    assert body["metrics"]["validation"] == "walk_forward"
+    assert body["metrics"]["benchmark"] == "DEMO_INDEX"
+
+
+def test_predict_with_old_settings():
+    res = _client().get(
+        "/api/predict", params={"ticker": "DEMO", "feature_set": "basic", "validation": "holdout"}
+    )
+    assert res.status_code == 200
+    m = res.json()["metrics"]
+    assert (m["feature_set"], m["validation"], m["folds"], m["benchmark"]) == ("basic", "holdout", 1, None)
+
+
+def test_invalid_options_return_422():
+    c = _client()
+    assert c.get("/api/predict", params={"ticker": "DEMO", "feature_set": "full"}).status_code == 422
+    assert c.get("/api/predict", params={"ticker": "DEMO", "validation": "kfold"}).status_code == 422
 
 
 def test_company_name_may_be_missing():

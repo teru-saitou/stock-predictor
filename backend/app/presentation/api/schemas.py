@@ -1,5 +1,6 @@
 """API のレスポンス型（Pydantic）。/docs にもこの型が表示される。"""
 from datetime import date
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -31,6 +32,12 @@ class MetricsOut(_Base):
     buy_hold_max_drawdown: float
     trades: int
     cost_per_trade: float
+    validation: Literal["walk_forward", "holdout"]
+    retrain_every: int | None
+    folds: int
+    feature_set: Literal["basic", "extended"]
+    feature_count: int
+    benchmark: str | None
 
 
 class PredictResponse(_Base):
