@@ -12,6 +12,7 @@ class _Base(BaseModel):
 class PricePointOut(_Base):
     date: date
     close: float
+    open: float
 
 
 class EquityPointOut(_Base):

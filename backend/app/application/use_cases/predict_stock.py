@@ -16,7 +16,7 @@ from app.application.dto import (
 from app.application.errors import ApplicationError
 from app.application.ports.predictor import FeatureBuilder, PredictorFactory
 from app.application.ports.price_repository import PriceRepository
-from app.domain.backtest import run_backtest
+from app.domain.backtest import holding_return, run_backtest, settlement_dates
 from app.domain.entities import PriceHistory
 from app.domain.errors import DomainError, InsufficientDataError
 from app.domain.evaluation import evaluate_accuracy
@@ -80,13 +80,17 @@ class PredictStockUseCase:
         pred = (proba > cfg.threshold).astype(int)
         acc = evaluate_accuracy(pred, y_test, y_train)
 
-        # 3. バックテスト
-        bt = run_backtest(pd.Series(pred, index=x_test.index), r.iloc[split:], inp.cost)
+        # 3. バックテスト：t の予測で t+1 の始値に買い、t+2 の始値で売る。
+        #    結果が出ていない最後の日は除き、資産額は結果が確定した日（t+2）の日付で返す
+        hold_ret = holding_return(history.open).reindex(x_test.index)
+        tradable = hold_ret.notna()
+        bt = run_backtest(pd.Series(pred, index=x_test.index)[tradable], hold_ret[tradable], inp.cost)
+        settled = settlement_dates(history.bars.index)
 
         # 4. 全データで学習し直して最新日の予測
         next_up_prob = float(self._fit_predict(x, y, latest_x)[0])
 
-        chart = history.close.iloc[-cfg.chart_days:]
+        chart = history.bars.iloc[-cfg.chart_days:]
         return PredictStockOutput(
             ticker=inp.ticker.upper(),
             name=self.repo.get_company_name(inp.ticker),
@@ -112,9 +116,12 @@ class PredictStockUseCase:
                 feature_count=x.shape[1],
                 benchmark=benchmark.ticker if benchmark is not None else None,
             ),
-            prices=[PricePoint(d.date(), round(float(c), 4)) for d, c in chart.items()],
+            prices=[
+                PricePoint(d.date(), round(float(c), 4), round(float(o), 4))
+                for d, c, o in zip(chart.index, chart["Close"].to_numpy(), chart["Open"].to_numpy())
+            ],
             equity=[
-                EquityPoint(d.date(), round(float(s), 4), round(float(b), 4))
+                EquityPoint(settled[d].date(), round(float(s), 4), round(float(b), 4))
                 for d, s, b in zip(
                     bt.strategy_equity.index,
                     bt.strategy_equity.to_numpy(),

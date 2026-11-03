@@ -31,6 +31,10 @@ class PriceHistory:
             raise InvalidPriceDataError("株価データが日付の昇順になっていません")
 
     @property
+    def open(self) -> pd.Series:
+        return self.bars["Open"]
+
+    @property
     def close(self) -> pd.Series:
         return self.bars["Close"]
 

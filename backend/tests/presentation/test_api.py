@@ -24,7 +24,7 @@ def test_predict_demo():
     assert body["ticker"] == "DEMO"
     assert body["name"] == "デモ銘柄（疑似データ）"
     assert 0 <= body["next_up_probability"] <= 1
-    assert body["metrics"]["test_days"] == len(body["equity"])
+    assert body["metrics"]["test_days"] - 1 == len(body["equity"])  # 最後の日は売る日の始値がまだ無い
     # 既定は「拡張特徴量 + ウォークフォワード」
     assert body["metrics"]["feature_set"] == "extended"
     assert body["metrics"]["validation"] == "walk_forward"
