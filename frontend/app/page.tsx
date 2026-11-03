@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { BacktestResult } from "@/components/BacktestResult";
 import { PredictionSummary } from "@/components/PredictionSummary";
@@ -29,6 +30,9 @@ export default function Home() {
     <main>
       <h1>Stock Predictor</h1>
       <p className="sub">翌営業日の騰落を予測し、過去データで検証します</p>
+      <p className="page-link">
+        <Link href="/nightly">毎朝の予測（主な銘柄をまとめて見る）→</Link>
+      </p>
 
       <div className="card">
         <SearchForm loading={loading} onSubmit={handleSearch} />

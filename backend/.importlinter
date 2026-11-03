@@ -10,7 +10,7 @@ include_external_packages = True
 name = 依存は外側から内側へ一方向のみ
 type = layers
 layers =
-    app.main
+    app.main | app.nightly
     app.container
     app.config
     app.presentation | app.infrastructure
