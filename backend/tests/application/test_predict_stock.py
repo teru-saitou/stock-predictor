@@ -1,4 +1,5 @@
 """application 層のテスト。ポートを偽実装に差し替え、ユースケースの流れだけを検証する。"""
+import pandas as pd
 import pytest
 
 from app.application.benchmark import benchmark_ticker_for
@@ -33,6 +34,24 @@ def test_always_up_model_matches_buy_and_hold():
     assert m.strategy_return == pytest.approx(m.buy_hold_return)
 
 
+def test_trades_at_next_open_and_buy_and_hold_uses_same_timing():
+    """t の予測で t+1 の始値に買う。買い持ちも同じ始値で買い、最後の始値で評価する。"""
+    history = demo_history(400)
+    out = _use_case(repo=InMemoryPriceRepository(history)).execute(_input(cost=0.0))
+    opens = history.open
+    first_signal = opens.index.get_loc(pd.Timestamp(out.metrics.test_period[0]))
+    bought, sold = opens.iloc[first_signal + 1], opens.iloc[-1]
+    assert out.metrics.buy_hold_return == pytest.approx(sold / bought - 1, rel=1e-9)
+    # 資産額は結果が確定した日（t+2）の日付で並ぶ
+    assert out.equity[0].date == opens.index[first_signal + 2].date()
+    assert out.equity[-1].date == opens.index[-1].date()
+
+
+def test_prices_include_open():
+    out = _use_case().execute(_input())
+    assert all(p.open > 0 for p in out.prices)
+
+
 def test_never_up_model_stays_in_cash():
     out = _use_case(predictor=lambda: ConstantPredictor(0.3)).execute(_input(cost=0.001))
     assert out.metrics.trades == 0
@@ -61,7 +80,7 @@ def test_walk_forward_retrains_periodically():
     assert m.validation == "walk_forward"
     assert m.retrain_every == 20
     assert m.folds == -(-m.test_days // 20)  # テスト日数 ÷ 20 の切り上げ
-    assert len(out.equity) == m.test_days
+    assert len(out.equity) == m.test_days - 1  # 最後の日は売る日の始値がまだ無い
 
 
 def test_holdout_trains_once():

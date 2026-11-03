@@ -25,11 +25,12 @@ class PredictStockInput:
 class PricePoint:
     date: date
     close: float
+    open: float  # バックテストは始値で売買するので、ツールチップで使う
 
 
 @dataclass(frozen=True)
 class EquityPoint:
-    date: date
+    date: date  # 売買の結果が確定した日（その日の始値で評価）
     strategy: float
     buy_hold: float
 

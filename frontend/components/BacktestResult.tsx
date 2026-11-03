@@ -10,15 +10,15 @@ import { Stat } from "./Stat";
 
 type Props = { metrics: Metrics; equity: EquityPoint[]; prices: PricePoint[]; prob: number };
 
-// 日付 t の資産額は「t の終値で持ち、翌営業日の終値まで保有した結果」なので、
-// ツールチップには翌営業日の株価を日付付きで添える
-type ChartPoint = EquityPoint & { priceDate?: string; close?: number };
+// 日付 d の資産額は「d の始値で売った（評価した）時点」の値なので、
+// ツールチップには同じ日の始値を添える
+type ChartPoint = EquityPoint & { open?: number };
 
 function withPrices(equity: EquityPoint[], prices: PricePoint[]): ChartPoint[] {
-  const index = new Map(prices.map((p, i) => [p.date, i]));
+  const opens = new Map(prices.map((p) => [p.date, p.open]));
   return equity.map((e) => {
-    const next = prices[(index.get(e.date) ?? -2) + 1];
-    return next ? { ...e, priceDate: next.date, close: next.close } : e;
+    const open = opens.get(e.date);
+    return open !== undefined ? { ...e, open } : e;
   });
 }
 
@@ -32,9 +32,9 @@ function EquityTooltip({ active, payload }: TooltipProps) {
       <div className="tt-date">{p.date}</div>
       <div className="tt-strategy">モデルどおり売買：{p.strategy.toFixed(3)}</div>
       <div className="tt-buyhold">株価の動き（買い持ち）：{p.buy_hold.toFixed(3)}</div>
-      {p.close !== undefined && (
+      {p.open !== undefined && (
         <div className="tt-price">
-          株価：{Math.round(p.close).toLocaleString()}円（{p.priceDate} 終値）
+          株価：{Math.round(p.open).toLocaleString()}円（{p.date} 始値）
         </div>
       )}
     </div>
@@ -86,13 +86,18 @@ export function BacktestResult({ metrics: m, equity, prices, prob }: Props) {
         <ul>
           <li>縦軸は、最初の資金を 1 とした倍率です（1.2 なら +20%、0.8 なら -20%）。</li>
           <li>青線は、モデルが「上がる」と予測した日だけ株を持った場合です。</li>
-          <li>灰色の線は、テスト期間初日の株価を 1 とした株価の動きです（最初に買って持ち続けた場合と同じ）。</li>
+          <li>灰色の線は、最初に買った日の始値を 1 とした株価の動きです（最初に買って持ち続けた場合と同じ）。</li>
           <li>青線が平らな期間は、「下がる」と予測して株を持たず、待っていた期間です。</li>
-          <li>線にマウスを置くと、その時点の実際の株価（円）も表示されます。</li>
+          <li>グラフの日付は売買の結果が出た日で、その日の始値で評価しています。線にマウスを置くと、その始値（円）も表示されます。</li>
         </ul>
         <h3>計算の前提</h3>
         <ul>
-          <li>「上がる」と予測した日の終値で買い、翌日の終値まで保有する単純な戦略です。</li>
+          <li>
+            その日の終値までのデータで予測し、「上がる」なら翌営業日の始値で買い、その次の営業日の始値で売る単純な戦略です。
+            続けて「上がる」と予測した日は売らずに持ち続けます。
+          </li>
+          <li>終値を見てから同じ終値で買うことはできないため、実際に注文が間に合う翌朝の始値で売買したものとして計算しています。</li>
+          <li>買い持ちも、同じ日の始値で買って最後の日の始値まで持ち続けた場合で比べています。</li>
           <li>片道 {pct(m.cost_per_trade, 2)} の取引コストを差し引いています。</li>
           <li>
             {m.validation === "walk_forward"

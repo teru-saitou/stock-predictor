@@ -2,7 +2,7 @@
 import pandas as pd
 import pytest
 
-from app.domain.backtest import max_drawdown, run_backtest
+from app.domain.backtest import holding_return, max_drawdown, run_backtest, settlement_dates
 from app.domain.entities import PriceHistory
 from app.domain.errors import InvalidPriceDataError
 from app.domain.labels import next_day_return, up_label
@@ -72,6 +72,30 @@ def test_backtest_charges_cost_on_each_trade():
     bt = run_backtest(pd.Series([1, 0, 1, 0], index=idx), ret, cost=0.01)
     assert bt.trades == 4
     assert bt.strategy_return == pytest.approx(0.99**4 - 1)
+
+
+def test_holding_return_buys_next_open_and_sells_following_open():
+    """t の予測では、t+1 の始値で買って t+2 の始値で売る。"""
+    open_ = pd.Series([100.0, 110.0, 121.0, 100.0])
+    r = holding_return(open_)
+    assert r.iloc[0] == pytest.approx(121 / 110 - 1)
+    assert r.iloc[1] == pytest.approx(100 / 121 - 1)
+    assert r.iloc[2:].isna().all()  # 売る日の始値がまだ無い
+
+
+def test_holding_return_does_not_use_same_day_prices():
+    """予測した日 t 自体の始値は使わない（t の終値を見てから t の値段では買えない）。"""
+    a = holding_return(pd.Series([100.0, 110.0, 121.0]))
+    b = holding_return(pd.Series([999.0, 110.0, 121.0]))
+    assert a.iloc[0] == b.iloc[0]
+
+
+def test_settlement_dates_are_two_business_days_later():
+    idx = pd.bdate_range("2024-01-01", periods=4)
+    s = settlement_dates(idx)
+    assert s.iloc[0] == idx[2]
+    assert s.iloc[1] == idx[3]
+    assert s.iloc[2:].isna().all()
 
 
 def test_max_drawdown():

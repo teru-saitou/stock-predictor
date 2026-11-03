@@ -10,8 +10,10 @@ export type PredictOptions = {
   validation: Validation;
 };
 
-export type PricePoint = { date: string; close: number };
+// open は古い nightly.json には無いことがある
+export type PricePoint = { date: string; close: number; open?: number };
 
+// date は売買の結果が確定した日（その日の始値で評価）
 export type EquityPoint = { date: string; strategy: number; buy_hold: number };
 
 export type Metrics = {

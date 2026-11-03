@@ -22,7 +22,7 @@ def test_run_nightly_keeps_going_after_a_failure():
     ok, ng = report["results"]
     # 中身は API の /api/predict と同じ形
     assert ok["ticker"] == "DEMO"
-    assert ok["data"]["metrics"]["test_days"] == len(ok["data"]["equity"])
+    assert ok["data"]["metrics"]["test_days"] - 1 == len(ok["data"]["equity"])  # 最後の日は売る日の始値がまだ無い
     assert ng["ticker"] == "NOPE.T" and "error" in ng
     assert succeeded_count(report) == 1
 
