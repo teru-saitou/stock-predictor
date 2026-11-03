@@ -1,6 +1,14 @@
-// バックエンドの app/api/schemas.py の PredictResponse と対応する型
+// バックエンドの app/presentation/api/schemas.py の PredictResponse と対応する型
 
 export type Period = "1y" | "2y" | "5y" | "10y" | "max";
+export type FeatureSet = "basic" | "extended";
+export type Validation = "walk_forward" | "holdout";
+
+export type PredictOptions = {
+  period: Period;
+  featureSet: FeatureSet;
+  validation: Validation;
+};
 
 export type PricePoint = { date: string; close: number };
 
@@ -18,6 +26,12 @@ export type Metrics = {
   buy_hold_max_drawdown: number;
   trades: number;
   cost_per_trade: number;
+  validation: Validation;
+  retrain_every: number | null;
+  folds: number;
+  feature_set: FeatureSet;
+  feature_count: number;
+  benchmark: string | null;
 };
 
 export type PredictResponse = {

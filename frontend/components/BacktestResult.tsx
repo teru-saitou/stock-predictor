@@ -44,7 +44,9 @@ export function BacktestResult({ metrics: m, equity }: Props) {
       <p className="note">
         「上がる」と予測した日の終値で買い、翌日終値まで保有する単純な戦略です。
         片道 {pct(m.cost_per_trade, 2)} の取引コストを差し引いています。
-        学習期間: {m.train_period[0]} 〜 {m.train_period[1]}。
+        {m.validation === "walk_forward"
+          ? `最初の学習期間: ${m.train_period[0]} 〜 ${m.train_period[1]}。以降は${m.retrain_every}営業日ごとに、その時点までの全データで学習し直しています。`
+          : `学習期間: ${m.train_period[0]} 〜 ${m.train_period[1]}。`}
         これは学習用のシミュレーションで、将来の成績を保証するものではありません。
       </p>
     </div>

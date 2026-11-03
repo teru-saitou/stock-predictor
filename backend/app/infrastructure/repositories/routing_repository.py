@@ -1,6 +1,6 @@
 """銘柄コードによって使うリポジトリを切り替える。
 
-"DEMO" は疑似データ、それ以外は本番用のリポジトリへ回す。
+"DEMO" / "DEMO_INDEX" は疑似データ、それ以外は本番用のリポジトリへ回す。
 """
 from app.application.ports.price_repository import PriceRepository
 from app.domain.entities import PriceHistory
@@ -12,7 +12,7 @@ class RoutingPriceRepository:
         self.demo = demo
 
     def _pick(self, ticker: str) -> PriceRepository:
-        return self.demo if ticker.upper() == "DEMO" else self.default
+        return self.demo if ticker.upper() in ("DEMO", "DEMO_INDEX") else self.default
 
     def get_price_history(self, ticker: str, period: str) -> PriceHistory:
         return self._pick(ticker).get_price_history(ticker, period)

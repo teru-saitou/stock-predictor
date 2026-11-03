@@ -6,18 +6,18 @@ import { PredictionSummary } from "@/components/PredictionSummary";
 import { PriceChart } from "@/components/PriceChart";
 import { SearchForm } from "@/components/SearchForm";
 import { fetchPrediction } from "@/lib/api";
-import type { Period, PredictResponse } from "@/types/predict";
+import type { PredictOptions, PredictResponse } from "@/types/predict";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<PredictResponse | null>(null);
 
-  async function handleSearch(ticker: string, period: Period) {
+  async function handleSearch(ticker: string, opts: PredictOptions) {
     setLoading(true);
     setError(null);
     try {
-      setData(await fetchPrediction(ticker, period));
+      setData(await fetchPrediction(ticker, opts));
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {

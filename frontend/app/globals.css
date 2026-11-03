@@ -81,3 +81,16 @@ code {
   background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
   padding: 0 4px; font-size: 12px;
 }
+
+/* 計算条件の選択 */
+.options { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+.options label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.options select { font-size: 13px; padding: 6px 10px; }
+
+/* 計算条件の表示 */
+.conditions { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 4px 0 14px; font-size: 12px; }
+.cond { color: var(--text); }
+.cond-label {
+  color: var(--muted); border: 1px solid var(--border); border-radius: 4px;
+  padding: 0 6px; margin-right: 6px; font-size: 11px;
+}

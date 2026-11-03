@@ -7,16 +7,30 @@ from app.domain.entities import PriceHistory
 from app.infrastructure.repositories.demo_repository import DemoPriceRepository
 
 
-def demo_history(days: int = 300) -> PriceHistory:
-    return DemoPriceRepository(days=days).get_price_history("DEMO", "5y")
+def demo_history(days: int = 300, ticker: str = "DEMO") -> PriceHistory:
+    return DemoPriceRepository(days=days).get_price_history(ticker, "5y")
 
 
 class InMemoryPriceRepository:
-    def __init__(self, history: PriceHistory, name: str | None = "テスト銘柄"):
+    """銘柄コードごとに決まった株価を返す。登録のない銘柄は DataNotFoundError。"""
+
+    def __init__(
+        self,
+        history: PriceHistory,
+        name: str | None = "テスト銘柄",
+        others: dict[str, PriceHistory] | None = None,
+    ):
         self.history = history
         self.name = name
+        self.others = {k.upper(): v for k, v in (others or {}).items()}
+        self.requested: list[str] = []
 
     def get_price_history(self, ticker: str, period: str) -> PriceHistory:
+        self.requested.append(ticker)
+        if ticker.upper() in self.others:
+            return self.others[ticker.upper()]
+        if ticker.startswith("^") or ticker.upper() == "DEMO_INDEX":
+            raise DataNotFoundError(f"データが取得できませんでした: {ticker}")
         return self.history
 
     def get_company_name(self, ticker: str) -> str | None:
@@ -36,10 +50,22 @@ class ConstantPredictor:
 
     def __init__(self, prob: float = 0.7):
         self.prob = prob
-        self.fitted_rows = 0
 
     def fit(self, features: pd.DataFrame, labels: pd.Series) -> None:
-        self.fitted_rows = len(features)
+        pass
 
     def predict_proba_up(self, features: pd.DataFrame) -> np.ndarray:
         return np.full(len(features), self.prob)
+
+
+class RecordingPredictor(ConstantPredictor):
+    """学習に使われたデータの最終日を記録する（未来のデータで学習していないか確認する用）。"""
+
+    log: list[tuple[pd.Timestamp, pd.Timestamp]] = []
+
+    def fit(self, features: pd.DataFrame, labels: pd.Series) -> None:
+        self._last_train = features.index[-1]
+
+    def predict_proba_up(self, features: pd.DataFrame) -> np.ndarray:
+        RecordingPredictor.log.append((self._last_train, features.index[0]))
+        return super().predict_proba_up(features)

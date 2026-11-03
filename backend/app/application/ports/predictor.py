@@ -13,11 +13,14 @@ from app.domain.entities import PriceHistory
 
 
 class FeatureBuilder(Protocol):
-    def build(self, history: PriceHistory) -> pd.DataFrame:
-        """index=日付、列=特徴量の DataFrame を返す。
+    # True のとき、ユースケースは市場指数（ベンチマーク）の株価も取得して渡す
+    uses_benchmark: bool
+
+    def build(self, history: PriceHistory, benchmark: PriceHistory | None = None) -> pd.DataFrame:
+        """index=日付（history と同じ）、列=特徴量の DataFrame を返す。
 
         日付 t の行は「t の終値時点までに分かる情報」だけで作ること（未来の情報を使わない）。
-        計算できない行は NaN のままでよい。
+        計算できない行は NaN のままでよい。benchmark が None でも動くこと。
         """
         ...
 
