@@ -1,0 +1,83 @@
+:root {
+  --bg: #f7f7f5;
+  --card: #ffffff;
+  --text: #1c1c1a;
+  --muted: #6b6b66;
+  --border: #e4e4df;
+  --accent: #2f5bd3;
+  --up: #1a8a5a;
+  --down: #c2412d;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141413;
+    --card: #1e1e1c;
+    --text: #ececea;
+    --muted: #9a9a94;
+    --border: #2e2e2b;
+    --accent: #7b9cf0;
+    --up: #4cc38a;
+    --down: #ee7a66;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+}
+main { max-width: 960px; margin: 0 auto; padding: 32px 16px 64px; }
+h1 { font-size: 24px; margin: 0 0 4px; }
+h2 { font-size: 16px; margin: 0 0 12px; }
+.sub { color: var(--muted); margin: 0 0 24px; font-size: 14px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+form { display: flex; gap: 8px; flex-wrap: wrap; }
+input, select, button {
+  font: inherit; padding: 8px 12px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+}
+input { flex: 1; min-width: 160px; }
+button { background: var(--accent); color: #fff; border: none; cursor: pointer; }
+button:disabled { opacity: 0.6; cursor: default; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.stat .label { color: var(--muted); font-size: 12px; }
+.stat .value { font-size: 22px; font-weight: 600; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.up { color: var(--up); }
+.down { color: var(--down); }
+.error { color: var(--down); }
+.note { color: var(--muted); font-size: 12px; margin-top: 12px; line-height: 1.6; }
+
+/* 会社名 */
+.company { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.company-name { font-size: 20px; font-weight: 700; }
+.ticker-badge {
+  font-size: 12px; color: var(--muted); border: 1px solid var(--border);
+  border-radius: 999px; padding: 2px 10px; font-variant-numeric: tabular-nums;
+}
+.company + h2 { color: var(--muted); font-weight: 500; font-size: 13px; }
+
+/* 銘柄コードの案内 */
+.guide { margin-top: 14px; font-size: 13px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  background: var(--bg); color: var(--text); border: 1px solid var(--border);
+  border-radius: 999px; padding: 4px 12px; font-size: 13px;
+}
+.chip:hover { border-color: var(--accent); }
+.chip-code { color: var(--muted); margin-left: 4px; }
+details { margin-top: 12px; color: var(--text); }
+summary { cursor: pointer; color: var(--accent); }
+details p, details ul { line-height: 1.7; margin: 8px 0; }
+details ul { padding-left: 20px; }
+details a { color: var(--accent); }
+code {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+  padding: 0 4px; font-size: 12px;
+}

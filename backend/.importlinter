@@ -1,0 +1,31 @@
+; 依存ルールの自動チェック（backend フォルダで `lint-imports` を実行）
+; 上に書いた層は下の層を import できるが、その逆はできない。
+; "|" で並べた層同士は、互いに import できない。
+
+[importlinter]
+root_package = app
+include_external_packages = True
+
+[importlinter:contract:layers]
+name = 依存は外側から内側へ一方向のみ
+type = layers
+layers =
+    app.main
+    app.container
+    app.config
+    app.presentation | app.infrastructure
+    app.application
+    app.domain
+
+[importlinter:contract:framework-free-core]
+name = domain と application はフレームワーク・外部サービスに依存しない
+type = forbidden
+source_modules =
+    app.domain
+    app.application
+forbidden_modules =
+    fastapi
+    starlette
+    pydantic
+    sklearn
+    yfinance
