@@ -71,9 +71,9 @@ export function hints(m: Metrics, prob: number) {
         : `やや下がりやすいという予測。ただし ${pct(prob)} は上がる可能性`,
     accuracy: `テスト期間（${m.test_days}営業日）で、翌日に上がるか下がるかを当てた割合`,
     baseline: "学習期間に多かった方（上昇か下落）を毎日答えた場合の正解率。モデルを比べる基準",
-    strategyReturn: `100万円が約${man(1 + m.strategy_return)}万円になった計算（過去の試算・税引き前）`,
-    buyHoldReturn: `最初に買って持ち続けた場合。100万円が約${man(1 + m.buy_hold_return)}万円`,
-    drawdown: `途中でいちばん資金が減ったときの幅。買い持ちでは一時、100万円が約${man(1 + m.buy_hold_max_drawdown)}万円まで減った`,
-    trades: `売買のたびに手数料がかかる（片道 ${pct(m.cost_per_trade, 2)} を差し引き済み）`,
+    strategyReturn: `100万円が約${man(1 + m.strategy_return)}万円に（税引き前）`,
+    buyHoldReturn: `買って持ち続けた場合。100万円が約${man(1 + m.buy_hold_return)}万円に`,
+    drawdown: `途中でいちばん減った幅。買い持ちは一時 約${man(1 + m.buy_hold_max_drawdown)}万円まで`,
+    trades: `売買のたびに手数料（片道 ${pct(m.cost_per_trade, 2)}、差し引き済み）`,
   };
 }
